@@ -24,6 +24,7 @@ module.exports = function(grunt) {
   // External lib.
   var phantomjs = require('grunt-lib-phantomjs').init(grunt);
   var reporters = require('mocha').reporters;
+  var output = require('mocha').output;
 
   // Helpers
   var helpers = require('../support/mocha-helpers');
@@ -123,6 +124,8 @@ module.exports = function(grunt) {
       log: false,
       // Mocha reporter
       reporter: 'Dot',
+      // Output option
+      output: '-',
       // Default PhantomJS timeout.
       timeout: 5000,
       // Mocha-PhantomJS bridge file to be injected.
@@ -168,12 +171,15 @@ module.exports = function(grunt) {
         phantomjsEventManager.remove(url);
       });
 
+      // Initialize mocha output stream.
+      var ostream = output.initialize(options.output);
+
       // Set Mocha reporter
       var Reporter = reporters[options.reporter];
       if (Reporter == null) {
         grunt.fatal('Reporter specified is unknown');
       }
-      reporter = new Reporter(runner);
+      reporter = new Reporter(runner, ostream);
 
       // Launch PhantomJS.
       phantomjs.spawn(url, {
