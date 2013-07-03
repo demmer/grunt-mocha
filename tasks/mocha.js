@@ -199,7 +199,7 @@ module.exports = function(grunt) {
 
             // If there was a PhantomJS error, abort the series.
             grunt.fatal(err);
-            done();
+            output.end(0, function(errCount) { done(); });
           } else {
             // If failures, show growl notice
             if (stats.failures > 0) {
@@ -252,8 +252,8 @@ module.exports = function(grunt) {
         grunt.warn(failMsg);
       }
 
-      // Async test done
-      done();
+      // Flush test output, then mark async test done
+      output.end(stats.failures, function(errCount) { done(); });
     });
   });
 };
