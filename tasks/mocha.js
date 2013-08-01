@@ -24,6 +24,7 @@ module.exports = function(grunt) {
   // External lib.
   var phantomjs = require('grunt-lib-phantomjs').init(grunt);
   var reporters = require('mocha').reporters;
+  var output = require('mocha').output;
 
   // Helpers
   var helpers = require('../support/mocha-helpers');
@@ -124,6 +125,8 @@ module.exports = function(grunt) {
       log: false,
       // Mocha reporter
       reporter: 'Dot',
+      // Output option
+      output: '-',
       // Default PhantomJS timeout.
       timeout: 5000,
       // Mocha-PhantomJS bridge file to be injected.
@@ -169,6 +172,9 @@ module.exports = function(grunt) {
         phantomjsEventManager.remove(url);
       });
 
+      // Initialize mocha output stream.
+      var ostream = output.initialize(options.output);
+
       // Set Mocha reporter
       var Reporter = null;
       if (reporters[options.reporter]) {
@@ -194,7 +200,7 @@ module.exports = function(grunt) {
       if (Reporter === null) {
         grunt.fatal('Specified reporter is unknown or unresolvable: ' + options.reporter);
       }
-      reporter = new Reporter(runner);
+      reporter = new Reporter(runner, ostream);
 
       // Launch PhantomJS.
       phantomjs.spawn(url, {
@@ -214,7 +220,7 @@ module.exports = function(grunt) {
 
             // If there was a PhantomJS error, abort the series.
             grunt.fatal(err);
-            done();
+            output.end(0, function(errCount) { done(); });
           } else {
             // If failures, show growl notice
             if (stats.failures > 0) {
@@ -267,8 +273,8 @@ module.exports = function(grunt) {
         grunt.warn(failMsg);
       }
 
-      // Async test done
-      done();
+      // Flush test output, then mark async test done
+      output.end(stats.failures, function(errCount) { done(); });
     });
   });
 };
