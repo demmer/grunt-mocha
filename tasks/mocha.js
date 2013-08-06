@@ -136,12 +136,24 @@ module.exports = function(grunt) {
       // Explicit non-file URLs to test.
       urls: [],
       // Fail with grunt.warn on first test failure
-      bail: false
+      bail: false,
+      // Log script errors as grunt errors
+      logErrors: false
     });
 
     // console.log pass-through.
     if (options.log) {
       phantomjs.on('console', grunt.log.writeln.bind(grunt.log));
+    }
+
+    // error handler
+    if (options.logErrors) {
+        phantomjs.on('error.*', function(error, stack) {
+            var stack = _.map(stack, function(frame) {
+                return "    at " + (frame.function ? frame.function : "undefined") + " (" + frame.file + ":" + frame.line + ")";
+            }).join("\n");
+            grunt.log.error(error + "\n" + stack);
+        });
     }
 
     // Clean Phantomjs options to prevent any conflicts
