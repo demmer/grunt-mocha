@@ -257,36 +257,37 @@ module.exports = function(grunt) {
         }
       });
     },
-    // All tests have been run.
     function() {
-      var stats = helpers.reduceStats(testStats);
+      // All tests have been run... flush the test reporter output
+      // then emit the final output
+      output.end(0, function() {
+        var stats = helpers.reduceStats(testStats);
+            
+        if (stats.failures === 0) {
+          var okMsg = stats.tests + ' passed!' + ' (' + stats.duration + 's)';
 
-      if (stats.failures === 0) {
-        var okMsg = stats.tests + ' passed!' + ' (' + stats.duration + 's)';
-
-        growl(okMsg, {
-          image: asset('growl/ok.png'),
-          title: 'Tests passed',
-          priority: 3
-        });
-
-        grunt.log.ok(okMsg);
-      } else {
-        var failMsg = stats.failures + '/' + stats.tests + ' tests failed (' +
-          stats.duration + 's)';
-
-        // Show Growl notice, if avail
-        growl(failMsg, {
-          image: asset('growl/error.png'),
-          title: 'Failure in ' + grunt.task.current.target,
-          priority: 3
-        });
-
-        grunt.warn(failMsg);
-      }
-
-      // Flush test output, then mark async test done
-      output.end(stats.failures, function(errCount) { done(); });
+          growl(okMsg, {
+            image: asset('growl/ok.png'),
+            title: 'Tests passed',
+            priority: 3
+          });
+  
+          grunt.log.ok(okMsg);
+        } else {
+          var failMsg = stats.failures + '/' + stats.tests + ' tests failed (' +
+            stats.duration + 's)';
+  
+          // Show Growl notice, if avail
+          growl(failMsg, {
+            image: asset('growl/error.png'),
+            title: 'Failure in ' + grunt.task.current.target,
+            priority: 3
+          });
+  
+          grunt.warn(failMsg);
+        }
+        done();
+      });
     });
-  });
+});
 };
