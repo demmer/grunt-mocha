@@ -124,6 +124,8 @@ module.exports = function(grunt) {
       log: false,
       // Mocha reporter
       reporter: 'Dot',
+      // Reporter-specific options
+      reporter_options: {},
       // Default PhantomJS timeout.
       timeout: 5000,
       // Mocha-PhantomJS bridge file to be injected.
@@ -194,7 +196,7 @@ module.exports = function(grunt) {
       if (Reporter === null) {
         grunt.fatal('Specified reporter is unknown or unresolvable: ' + options.reporter);
       }
-      reporter = new Reporter(runner);
+      reporter = new Reporter(runner, options.reporter_options);
 
       // Launch PhantomJS.
       phantomjs.spawn(url, {
@@ -267,8 +269,12 @@ module.exports = function(grunt) {
         grunt.warn(failMsg);
       }
 
-      // Async test done
-      done();
+      // Flush reporter output and note async test done
+      if (reporter.done) {
+          reporter.done(stats.failures, done);
+      } else {
+          done();
+      }
     });
   });
 };
