@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "grunt-lib-phantomjs": "~0.3",
-    "mocha": "https://www.github.com/demmer/mocha/tarball/reporter_options"
+    "mocha": "git+http://www.github.com/demmer/mocha#1.13.0-jut-1"
   },
   "peerDependencies": {
     "grunt": "~0.4"
