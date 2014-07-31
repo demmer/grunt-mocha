@@ -45,7 +45,6 @@ var mochaHooks = {
             // prepare timeout for function
             var asyncDone = false;
             setTimeout(function() {
-                console.log('running timeout hook');
                 if (!asyncDone) {
                     throw new Error('Hook ' + ev + ' timed out after ' + mochaHooks.timeout + 'ms');
                 }
