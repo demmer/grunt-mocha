@@ -264,7 +264,7 @@ mocha: {
 ```
 
 ## Hooks
-`grunt-mocha` contains an API to subscribe to all of mocha's runner hooks.  The `mochaHooks` object which is available as a global variable in phantomjs allows a user to subscribe a single synchronous function to each event through the `mochaHooks.on` function.  Any code within the hook is guarenteed to run before the event is bubbled into the grunt process.
+grunt-mocha contains an API to subscribe to all of mocha's runner hooks.  The `mochaHooks` object which is available as a global variable in phantomjs allows a user to subscribe a single synchronous function to each event through the `mochaHooks.on` function.  Any code within the hook is guarenteed to run before the event is bubbled into the grunt process.
 
 ### Events
 The mocha events that can be subscribed to are: `start`, `test`, `test end`, `suite`, `suite end`, `fail`, `pass`, `pending`, and `end`.
