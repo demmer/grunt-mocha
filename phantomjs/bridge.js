@@ -9,6 +9,15 @@
 
 /*global mocha:true, alert:true, window:true */
 
+// object that can subscribe hooks
+var mochaHooks = {
+    hooks: {},
+    timeout: 10*1000,
+    on: function(ev, fn) {
+        this.hooks[ev] = fn;
+    }
+};
+
 (function() {
     // Send messages to the parent phantom.js process via alert! Good times!!
     function sendMessage() {
@@ -29,6 +38,23 @@
           data.state = test.state;
           data.duration = test.duration;
           data.slow = test.slow;
+        }
+        
+        // run the hook associated with the event
+        if (typeof mochaHooks.hooks[ev] === 'function') {
+            // prepare timeout for function
+            var asyncDone = false;
+            setTimeout(function() {
+                console.log('running timeout hook');
+                if (!asyncDone) {
+                    throw new Error('Hook ' + ev + ' timed out after ' + mochaHooks.timeout + 'ms');
+                }
+            }, mochaHooks.timeout);
+            
+            // run the hooks function
+            mochaHooks.hooks[ev]();
+            
+            asyncDone = true;
         }
 
         sendMessage('mocha.' + ev, data);
